@@ -12,6 +12,12 @@ def connect_to_db():
     user = cryptocode.decrypt(config.get("APP","user"),key)
     password = cryptocode.decrypt(config.get("APP","password"),key)
     port = cryptocode.decrypt(config.get("APP","port"),key)
+
+    # database = 'cadm_syn_try'
+    # server = 'localhost'
+    # user = 'postgres'
+    # password = 'admin'
+    # port = 5432
     try:     
         conn = psycopg2.connect(
             dbname=database,
