@@ -2,7 +2,7 @@ import pandas as pd
 import time
 from openpyxl import load_workbook
 from openpyxl.worksheet.table import Table, TableStyleInfo
-from openpyxl.styles import Alignment
+from openpyxl.styles import Alignment,Font
 
 def query_to_excel(conn, query, excel_file, sheet_name):
     try:
@@ -19,7 +19,16 @@ def query_to_excel(conn, query, excel_file, sheet_name):
         libro = load_workbook(excel_file)
         hoja = libro[sheet_name]
 
-        tab_range = f"A1:{chr(64 + len(df.columns))}{len(df) + 1}"
+        hoja.insert_rows(1)
+
+        num_columns = len(df.columns)
+
+        title = "Reporte de Datos"  
+        hoja.cell(row=1, column=2, value=title)
+
+        bloque = hoja.merge_cells(f'A1:{chr(64 + len(df.columns))}{len(df)+ 1}')
+
+        tab_range = f"A2:{chr(64 + len(df.columns))}{len(df) + 2}"
 
         tab = Table(displayName="Tabla1", ref=tab_range)
 
@@ -41,19 +50,23 @@ def query_to_excel(conn, query, excel_file, sheet_name):
                     for c in cell:
                         c.number_format = '#,##0.00'  # Formato con separador de miles
 
-        if 'total_amount' in df.columns:
-            if 'document_no' in df.columns:
-                for cell in hoja['E'][1:]:
+        if 'Monto Total' in df.columns:
+            if 'Numero de Documento' in df.columns:
+                for cell in hoja['C'][2:]:
+                    cell.alignment = Alignment(horizontal='center')
+                for cell in hoja['D'][2:]:
+                    cell.alignment = Alignment(horizontal='center')
+                for cell in hoja['E'][2:]:
                     cell.alignment = Alignment(horizontal='center')
             else:
-                for cell in hoja['C'][1:]:  
+                for cell in hoja['C'][2:]:  
                     cell.alignment = Alignment(horizontal='center')
                 
 
 
         for column in hoja.columns:
             max_length = 0
-            column_letter = column[0].column_letter
+            column_letter = column[1].column_letter
             for cell in column:
                 try:
                     if cell.value:

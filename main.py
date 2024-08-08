@@ -69,9 +69,9 @@ def main(page: ft.Page):
 
         query1 = """
       SELECT 
-      sales_operation_details.code_product,
-      products.description,
-      SUM(CASE WHEN sales_operation.operation_type = 'BILL' THEN sales_operation_details.amount ELSE -sales_operation_details.amount END) as total_amount,
+      sales_operation_details.code_product as "Codigo",
+      products.description as "Descripcion",
+      SUM(CASE WHEN sales_operation.operation_type = 'BILL' THEN sales_operation_details.amount ELSE -sales_operation_details.amount END) as "Monto Total",
       ROUND(SUM(CASE 
             WHEN sales_operation_details.coin_code = '01' THEN 
               CASE 
@@ -83,7 +83,7 @@ def main(page: ft.Page):
                 WHEN sales_operation.operation_type = 'BILL' THEN sales_operation_details.total / sales_operation_coins.buy_aliquot 
                 ELSE -sales_operation_details.total / sales_operation_coins.buy_aliquot 
               END 
-          END)::DECIMAL,2) as total_coin_DLS,
+          END)::DECIMAL,2) as "Total $",
       ROUND(SUM(CASE 
             WHEN sales_operation_details.coin_code = '02' THEN 
               CASE 
@@ -95,7 +95,7 @@ def main(page: ft.Page):
                 WHEN sales_operation.operation_type = 'BILL' THEN sales_operation_details.total * sales_operation_coins.buy_aliquot 
                 ELSE -sales_operation_details.total * sales_operation_coins.buy_aliquot 
               END 
-          END)::DECIMAL,2) as total_coin_BS
+          END)::DECIMAL,2) as "Total Bs"
     FROM 
       sales_operation_details
     INNER JOIN 
@@ -149,11 +149,12 @@ def main(page: ft.Page):
         """
         query2="""
         SELECT 
-      shopping_operation_details.code_product,
-      products.description,
-      shopping_operation.document_no,
-      shopping_operation.provider_name,
-      SUM(CASE WHEN shopping_operation.operation_type = 'BILL' THEN shopping_operation_details.amount ELSE -shopping_operation_details.amount END) as total_amount,
+      shopping_operation_details.code_product as "Codigo",
+      products.description as "Descripcion",
+      SUM(CASE WHEN shopping_operation.operation_type = 'BILL' THEN shopping_operation_details.amount ELSE -shopping_operation_details.amount END) as "Monto Total",
+      shopping_operation.document_no as "Numero de Documento",
+      shopping_operation.emission_date as "Fecha de Emisión",
+      shopping_operation.provider_name as "Proveedor",
       ROUND(SUM(CASE 
             WHEN shopping_operation_details.coin_code = '01' THEN 
               CASE 
@@ -165,7 +166,7 @@ def main(page: ft.Page):
                 WHEN shopping_operation.operation_type = 'BILL' THEN shopping_operation_details.total / shopping_operation_coins.buy_aliquot 
                 ELSE -shopping_operation_details.total / shopping_operation_coins.buy_aliquot 
               END 
-          END)::DECIMAL,2) as total_coin_DLS,
+          END)::DECIMAL,2) as "Total $",
       ROUND(SUM(CASE 
             WHEN shopping_operation_details.coin_code = '02' THEN 
               CASE 
@@ -177,7 +178,7 @@ def main(page: ft.Page):
                 WHEN shopping_operation.operation_type = 'BILL' THEN shopping_operation_details.total * shopping_operation_coins.buy_aliquot 
                 ELSE -shopping_operation_details.total * shopping_operation_coins.buy_aliquot 
               END 
-          END)::DECIMAL,2) as total_coin_BS
+          END)::DECIMAL,2) as "Total Bs"
     FROM 
       shopping_operation_details
     INNER JOIN 
@@ -200,7 +201,8 @@ def main(page: ft.Page):
       shopping_operation_details.code_product,
       products.description,
       shopping_operation.provider_name,
-      shopping_operation.document_no
+      shopping_operation.document_no,
+      shopping_operation.emission_date
     HAVING 
       SUM(CASE WHEN shopping_operation.operation_type = 'BILL' THEN shopping_operation_details.amount ELSE -shopping_operation_details.amount END) != 0 OR
       SUM(CASE 
@@ -234,8 +236,8 @@ def main(page: ft.Page):
         conn = connect_to_db()
 
         if conn:
-            execute_query_and_save(conn, query1, file_path, "Psicotropicos")
-            execute_query_and_save(conn, query2, file_path1, "Psicotropicos")
+            execute_query_and_save(conn, query1, file_path, "Controlados")
+            execute_query_and_save(conn, query2, file_path1, "Controlados")
             conn.close()
         else:
             print("No se pudo establecer la conexión a la base de datos. Verifica los parámetros de conexión.")
