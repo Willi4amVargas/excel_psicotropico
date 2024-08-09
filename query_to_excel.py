@@ -2,14 +2,14 @@ import pandas as pd
 import time
 from openpyxl import load_workbook
 from openpyxl.worksheet.table import Table, TableStyleInfo
-from openpyxl.styles import Alignment,Font
+from openpyxl.styles import Alignment,Font,PatternFill, Border, Side
 
-def query_to_excel(conn, query, excel_file, sheet_name):
+def query_to_excel(conn, query, excel_file, sheet_name,title):
     try:
         print(f"Creando Archivo en la hoja {sheet_name}")
         df = pd.read_sql_query(query, conn)
 
-        columns_to_replace = ['total_coin_dls', 'total_coin_bs']
+        columns_to_replace = ['Total $', 'Total Bs']
         # df = replace_dot_with_comma(df, columns_to_replace)
 
         with pd.ExcelWriter(excel_file, engine='openpyxl', mode='w') as writer:
@@ -21,12 +21,16 @@ def query_to_excel(conn, query, excel_file, sheet_name):
 
         hoja.insert_rows(1)
 
-        num_columns = len(df.columns)
+        hoja.cell(row=1, column=1, value=title)
 
-        title = "Reporte de Datos"  
-        hoja.cell(row=1, column=2, value=title)
+        hoja.merge_cells(f'A1:{chr(64 + len(df.columns))}1')
 
-        bloque = hoja.merge_cells(f'A1:{chr(64 + len(df.columns))}{len(df)+ 1}')
+        title_cell = hoja['A1']
+        title_cell.font = Font(bold=True, size=12, color="000000")  # Fuente en negrita, tamaño 16, color blanco
+        title_cell.fill = PatternFill(start_color="8DB4E2", end_color="8DB4E2", fill_type="solid")  # Fondo azul marino
+        title_cell.alignment = Alignment(horizontal='center')
+        border = Side(border_style="thin", color="000000")
+        title_cell.border = Border(left=border, right=border, top=border, bottom=border)
 
         tab_range = f"A2:{chr(64 + len(df.columns))}{len(df) + 2}"
 

@@ -3,7 +3,6 @@ from query_to_excel import query_to_excel
 from datetime import datetime
 from dateutil.relativedelta import relativedelta
 import os
-import time
 import flet as ft
 import threading
 
@@ -13,8 +12,8 @@ def execute_query_and_save(conn, query, excel_file, sheet_name):
 
 def main(page: ft.Page):
     # Configura el tamaño de la ventana
-    width = 500  # Ancho deseado
-    height = 200  # Alto deseado
+    width = 550  # Ancho deseado
+    height = 300  # Alto deseado
 
     # Establece el tamaño de la ventana
     page.window_width = width
@@ -64,6 +63,9 @@ def main(page: ft.Page):
 
         excel_file1 = f"relacion_de_compras_controlados_{fecha_formateada}.xlsx"
         file_path1 = os.path.join(folder_path, excel_file1)
+
+        title1=f"Ventas Controlados {fecha_formateada}"
+        title2=f"Compras Controlados {fecha_formateada}"
 
 
 
@@ -236,16 +238,42 @@ def main(page: ft.Page):
         conn = connect_to_db()
 
         if conn:
-            execute_query_and_save(conn, query1, file_path, "Controlados")
-            execute_query_and_save(conn, query2, file_path1, "Controlados")
+            query_to_excel(conn,query1,file_path,"Controlados",title1)
+            query_to_excel(conn,query2,file_path1,"Controlados",title2)
             conn.close()
         else:
             print("No se pudo establecer la conexión a la base de datos. Verifica los parámetros de conexión.")
       except Exception as e:
          print(F"Error: {e}")
       finally:
-        page.window.close()
+        page.clean()
+        page.add(
+           ft.FilledButton("Abrir Relacion de ventas controlados",style=ft.ButtonStyle(bgcolor=ft.colors.GREEN_500,color="WHITE"),key=file_path,on_click=open_excel)
+        )
+        page.add(
+           ft.FilledButton("Abrir Relacion de compras controlados",style=ft.ButtonStyle(bgcolor=ft.colors.GREEN_500,color="WHITE"),key=file_path1,on_click=open_excel)
+        )
+        page.add(
+           ft.FilledButton("Abrir Relacion de ventas y compras controlados",style=ft.ButtonStyle(bgcolor=ft.colors.GREEN_500,color="WHITE"),key=[file_path,file_path1],on_click=open_all_excels)
+        )
+        page.add(
+           ft.FilledButton("Salir",style=ft.ButtonStyle(bgcolor=ft.colors.RED_500,color="WHITE"),on_click=salir)
+        )
+        page.update()
     threading.Thread(target=run_task).start()
+
+    def open_excel(event):
+      path = event.control.key
+      os.startfile(path)
+      page.window.destroy()
+    def open_all_excels(event):
+      paths=event.control.key
+      os.startfile(paths[0])
+      os.startfile(paths[1])
+      page.window.destroy()
+
+    def salir(event):
+       page.window.destroy()
 
 if __name__ == "__main__":
     ft.app(target=main)
