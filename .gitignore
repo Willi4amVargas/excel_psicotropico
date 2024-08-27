@@ -4,3 +4,6 @@ Notas.txt
 build
 dist
 Reporte_Controlados.spec
+.gitignore
+queryPsicotropicos.sql
+queryPsicotropicos2.sql

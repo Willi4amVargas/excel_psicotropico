@@ -12,8 +12,8 @@ def execute_query_and_save(conn, query, excel_file, sheet_name):
 
 def main(page: ft.Page):
     # Configura el tamaño de la ventana
-    width = 550  # Ancho deseado
-    height = 300  # Alto deseado
+    width = 480  # Ancho deseado
+    height = 250  # Alto deseado
 
     # Establece el tamaño de la ventana
     page.window_width = width
@@ -155,7 +155,7 @@ def main(page: ft.Page):
       products.description as "Descripcion",
       SUM(CASE WHEN shopping_operation.operation_type = 'BILL' THEN shopping_operation_details.amount ELSE -shopping_operation_details.amount END) as "Monto Total",
       shopping_operation.document_no as "Numero de Documento",
-      shopping_operation.emission_date as "Fecha de Emisión",
+      shopping_operation.register_date as "Fecha de Registro",
       shopping_operation.provider_name as "Proveedor",
       ROUND(SUM(CASE 
             WHEN shopping_operation_details.coin_code = '01' THEN 
@@ -204,7 +204,7 @@ def main(page: ft.Page):
       products.description,
       shopping_operation.provider_name,
       shopping_operation.document_no,
-      shopping_operation.emission_date
+      shopping_operation.register_date
     HAVING 
       SUM(CASE WHEN shopping_operation.operation_type = 'BILL' THEN shopping_operation_details.amount ELSE -shopping_operation_details.amount END) != 0 OR
       SUM(CASE 
@@ -244,20 +244,65 @@ def main(page: ft.Page):
         else:
             print("No se pudo establecer la conexión a la base de datos. Verifica los parámetros de conexión.")
       except Exception as e:
-         print(F"Error: {e}")
+        print(F"Error: {e}")
       finally:
+        button_width=480
+        button_height=30
         page.clean()
         page.add(
-           ft.FilledButton("Abrir Relacion de ventas controlados",style=ft.ButtonStyle(bgcolor=ft.colors.GREEN_500,color="WHITE"),key=file_path,on_click=open_excel)
-        )
+          ft.FilledButton("ABRIR RELACIÓN DE VENTAS CONTROLADOS",
+                            style=ft.ButtonStyle(
+                              bgcolor=ft.colors.GREEN_500,
+                              color="WHITE",
+                              shape={
+                                    ft.ControlState.DEFAULT: ft.RoundedRectangleBorder(radius=0)
+                                },
+                              ),
+                              width=button_width,
+                              height=button_height,
+                              key=file_path,
+                              on_click=open_excel
+                              )
+          )
         page.add(
-           ft.FilledButton("Abrir Relacion de compras controlados",style=ft.ButtonStyle(bgcolor=ft.colors.GREEN_500,color="WHITE"),key=file_path1,on_click=open_excel)
-        )
+          ft.FilledButton("ABRIR RELACIÓN DE COMPRAS CONTROLADOS",
+                            style=ft.ButtonStyle(
+                              bgcolor=ft.colors.GREEN_500,
+                              color="WHITE",
+                              shape={
+                                    ft.ControlState.DEFAULT: ft.RoundedRectangleBorder(radius=0)
+                                }
+                              ),
+                              width=button_width,
+                              height=button_height,
+                              key=file_path1,
+                              on_click=open_excel
+                              )
+          )
         page.add(
-           ft.FilledButton("Abrir Relacion de ventas y compras controlados",style=ft.ButtonStyle(bgcolor=ft.colors.GREEN_500,color="WHITE"),key=[file_path,file_path1],on_click=open_all_excels)
-        )
+          ft.FilledButton("ABRIR RELACIÓN DE VENTAS Y COMPRAS CONTROLADOS",
+                            style=ft.ButtonStyle(
+                              bgcolor=ft.colors.GREEN_500,
+                              color="WHITE",
+                              shape={
+                                    ft.ControlState.DEFAULT: ft.RoundedRectangleBorder(radius=0)
+                                }
+                              ),
+                              width=button_width,
+                              height=button_height,
+                              key=[file_path,file_path1],
+                              on_click=open_all_excels
+                              )
+          )
         page.add(
-           ft.FilledButton("Salir",style=ft.ButtonStyle(bgcolor=ft.colors.RED_500,color="WHITE"),on_click=salir)
+          ft.FilledButton("SALIR",
+                          style=ft.ButtonStyle(
+                            bgcolor=ft.colors.RED_500,
+                            color="WHITE",
+                            shape={
+                                    ft.ControlState.DEFAULT: ft.RoundedRectangleBorder(radius=0)
+                                }
+                          ),on_click=salir)
         )
         page.update()
     threading.Thread(target=run_task).start()
@@ -271,9 +316,8 @@ def main(page: ft.Page):
       os.startfile(paths[0])
       os.startfile(paths[1])
       page.window.destroy()
-
     def salir(event):
-       page.window.destroy()
+      page.window.destroy()
 
 if __name__ == "__main__":
     ft.app(target=main)

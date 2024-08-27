@@ -7,11 +7,11 @@ def connect_to_db():
     config = Config()
     config.read("c:/Sysven/config.ini")
 
-    database = cryptocode.decrypt(config.get("APP","database"),key)
-    server = cryptocode.decrypt(config.get("APP","server"),key)
-    user = cryptocode.decrypt(config.get("APP","user"),key)
-    password = cryptocode.decrypt(config.get("APP","password"),key)
-    port = cryptocode.decrypt(config.get("APP","port"),key)
+    database = cryptocode.decrypt(config.get("LOCAL","database"),key)
+    server = cryptocode.decrypt(config.get("LOCAL","server"),key)
+    user = cryptocode.decrypt(config.get("LOCAL","user"),key)
+    password = cryptocode.decrypt(config.get("LOCAL","password"),key)
+    port = cryptocode.decrypt(config.get("LOCAL","port"),key)
 
     # database = 'cadm_syn_try'
     # server = 'localhost'
